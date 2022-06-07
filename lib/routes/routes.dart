@@ -40,3 +40,6 @@ import 'package:instagram_app/instagram/instagram.dart';
 )
 
 class $Routes {}
+
+// flutter pub run build_runner build --delete-conflicting-outputs
+// flutter pub run build_runner watch --delete-conflicting-outputs

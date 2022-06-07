@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
 
 import 'package:auto_route/auto_route.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 import 'package:instagram_app/routes/routes.gr.dart';
 import 'package:instagram_app/instagram/widgets/widgets.dart';
+import 'package:instagram_app/instagram/blocs/blocs.dart';
+import 'package:instagram_app/instagram/screens/screens.dart';
 
 class InstagramScreen extends StatelessWidget {
    
@@ -13,23 +16,29 @@ class InstagramScreen extends StatelessWidget {
   
   @override
   Widget build(BuildContext context) {
-    return AutoTabsRouter(
-      routes: const [
-        HomeRouter(),
-        SearchRouter(),
-        ReelsRouter(),
-        ShopRouter(),
-        ProfileRouter()
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (context) => HomeBloc(),)
       ],
-      builder: (context, child, animation) {
-
-        final tabsRouter = AutoTabsRouter.of(context);
-
-        return tabsRouter.activeIndex == 0 ? _buildHomePageView(
-          child, 
-          tabsRouter
-        ) : buildNormalScaffolds(child, tabsRouter);
-      },  
+      child: AutoTabsRouter(
+        routes: const [
+          HomeRouter(),
+          SearchRouter(),
+          ReelsRouter(),
+          ShopRouter(),
+          ProfileRouter()
+        ],
+        builder: (context, child, animation) {
+    
+          final tabsRouter = AutoTabsRouter.of(context);
+    
+          return tabsRouter.activeIndex == 0 ? _buildHomePageView(
+            context,
+            child, 
+            tabsRouter
+          ) : buildNormalScaffolds(child, tabsRouter);
+        },  
+      ),
     );    
   }
 
@@ -40,30 +49,20 @@ class InstagramScreen extends StatelessWidget {
     );
   }
 
-  PageView _buildHomePageView(Widget child, TabsRouter tabsRouter) {
+  PageView _buildHomePageView(BuildContext context, Widget child, TabsRouter tabsRouter) {
 
     //Puedo crear un bloc donde se maneje la logica del pageController y en general del HomePage 
 
     return PageView(
       scrollDirection: Axis.horizontal,
-      controller: PageController(
-        initialPage: 1
-      ),
+      controller: BlocProvider.of<HomeBloc>(context).pageViewController,
       children: [
-        Scaffold(
-          body: Container(
-            color: Colors.red,
-          ),
-        ),
+        const CameraScreen(),
         Scaffold(
           body: child,
           bottomNavigationBar: CustomBottomNavigationBar(tabsRouter: tabsRouter),
         ),
-        Scaffold(
-          body: Container(
-            color: Colors.blue,
-          ),
-        ),
+        const MessagesScreen()
       ],
     );
   }
